@@ -60,6 +60,15 @@ Tell the FC where your GPS is wired (e.g., UART1). If you are using a modern M10
 ArduPilot handles total pack voltage perfectly out of the box. However, if you add the "Average Cell Voltage" element to your OSD, it might display `--v`. This happens because ArduPilot tries to auto-detect the cell count (2S, 3S, etc.) based on the initial voltage when plugged in. If you plug in a battery at "storage" voltage, the math fails and it safely aborts the calculation.
 *   **The Fix:** Search for **`OSD_CELL_COUNT`** and change it from 0 (Auto) to the exact number of cells for the battery you use on your car (e.g., 3 for a 3S pack).
 
+### 5. Low Battery OSD Warnings (2S LiPo Example)
+To ensure you don't over-discharge your battery, you can configure ArduRover to flash visual warnings directly on your DJI O4 display. The following example parameters are tuned for a 2S LiPo pack, triggering a warning at 3.59V per cell (7.18V total):
+
+*   **`BATT_LOW_VOLT`**: 7.18 (This is the core failsafe trigger. When the total voltage drops below 7.18V for more than 10 seconds, it triggers the global "Low Battery" warning.)
+*   **`BATT_CRT_VOLT`**: 7.0 (Optional: Sets a 3.50V per cell threshold to trigger a secondary critical warning if you push the pack too far.)
+*   **`BATT_FS_LOW_ACT`**: 0 (Sets the failsafe action to "Warn Only" or "None". This is critical for an RC surface vehicle; it ensures the flight controller only sends the warning to your DJI O4 display rather than aggressively braking or attempting an autonomous Return-to-Launch.)
+*   **`OSD_W_BATVOLT`**: 7.18 or 7.2 (This parameter specifically controls the Canvas Mode OSD. When the voltage drops below this threshold, the actual battery voltage element on your goggles will begin flashing. Note: ArduPilot may round this to a tenth of a volt, so 7.2 is perfectly fine here.)
+*   **`OSD1_MESSAGE_EN`**: 1 (Verify that the messages panel is enabled for your active OSD screen. When the `BATT_LOW_VOLT` threshold is breached, ArduRover will push a flashing "Low Battery" text alert directly to this area of the display.)
+
 ## Operational Workflow
 Once configured, the system works flawlessly with almost zero friction:
 
